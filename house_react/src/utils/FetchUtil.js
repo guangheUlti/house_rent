@@ -1,32 +1,36 @@
 // @Author : guanghe 
-require('es6-promise').polyfill();
 require('isomorphic-fetch');
+require('es6-promise').polyfill();
 
 function parseJSON(response) {
 	return response.json();
 }
-
 function checkStatus(response) {
 	if (response.status >= 200 && response.status < 300) {
 		return response;
 	}
-
 	const error = new Error(response.statusText);
 	error.response = response;
 	throw error;
 }
-
-/**
- * Requests a URL, returning a promise.
- *
- * @param  {string} url       The URL we want to request
- * @param  {object} [options] The options we want to pass to "fetch"
- * @return {object}           An object containing either "data" or "err"
- */
-export default function request(url, options) {
-	return fetch(url, options)
-		.then(checkStatus)
-		.then(parseJSON)
-		.then(data => ({ data }))
-		.catch(err => ({ err }));
+function GHFetch(url, params, callback) {
+	let paramsStr = "";
+	if(params != null) {
+		let first = true;
+		for(let p in params) {
+			if(params[p]) {
+				paramsStr += (first ? "" : "&") + p + "=" + params[p];
+				first = false;
+			}
+		}
+	}
+	return fetch(url, {
+		method: "POST",
+		headers: {"Content-Type":"application/x-www-form-urlencoded"},
+	  	body: paramsStr
+	}).then(checkStatus)
+	.then(parseJSON)
+	.then(json => {callback(json)})
+	.catch(err => { alert("request failed " + err); });
 }
+export default GHFetch;
