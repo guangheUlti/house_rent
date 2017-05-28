@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.guangsoft.mapper.TbHouseMapper" >
+  <resultMap id="BaseResultMap" type="org.guangsoft.pojo.TbHouse" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="brief" property="brief" jdbcType="VARCHAR" />
+    <result column="addcode" property="addcode" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="area" property="area" jdbcType="DOUBLE" />
+    <result column="floor" property="floor" jdbcType="INTEGER" />
+    <result column="rooms" property="rooms" jdbcType="INTEGER" />
+    <result column="orient" property="orient" jdbcType="VARCHAR" />
+    <result column="rental" property="rental" jdbcType="DOUBLE" />
+    <result column="lease" property="lease" jdbcType="INTEGER" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, brief, addcode, address, type, area, floor, rooms, orient, rental, lease, detail, 
+    status, create_time, update_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="org.guangsoft.pojo.TbHouseExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tb_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_house
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_house
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="org.guangsoft.pojo.TbHouseExample" >
+    delete from tb_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="org.guangsoft.pojo.TbHouse" >
+    insert into tb_house (id, brief, addcode, 
+      address, type, area, 
+      floor, rooms, orient, 
+      rental, lease, detail, 
+      status, create_time, update_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{brief,jdbcType=VARCHAR}, #{addcode,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, #{area,jdbcType=DOUBLE}, 
+      #{floor,jdbcType=INTEGER}, #{rooms,jdbcType=INTEGER}, #{orient,jdbcType=VARCHAR}, 
+      #{rental,jdbcType=DOUBLE}, #{lease,jdbcType=INTEGER}, #{detail,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.guangsoft.pojo.TbHouse" >
+    insert into tb_house
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="brief != null" >
+        brief,
+      </if>
+      <if test="addcode != null" >
+        addcode,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="area != null" >
+        area,
+      </if>
+      <if test="floor != null" >
+        floor,
+      </if>
+      <if test="rooms != null" >
+        rooms,
+      </if>
+      <if test="orient != null" >
+        orient,
+      </if>
+      <if test="rental != null" >
+        rental,
+      </if>
+      <if test="lease != null" >
+        lease,
+      </if>
+      <if test="detail != null" >
+        detail,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="brief != null" >
+        #{brief,jdbcType=VARCHAR},
+      </if>
+      <if test="addcode != null" >
+        #{addcode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="area != null" >
+        #{area,jdbcType=DOUBLE},
+      </if>
+      <if test="floor != null" >
+        #{floor,jdbcType=INTEGER},
+      </if>
+      <if test="rooms != null" >
+        #{rooms,jdbcType=INTEGER},
+      </if>
+      <if test="orient != null" >
+        #{orient,jdbcType=VARCHAR},
+      </if>
+      <if test="rental != null" >
+        #{rental,jdbcType=DOUBLE},
+      </if>
+      <if test="lease != null" >
+        #{lease,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null" >
+        #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.guangsoft.pojo.TbHouseExample" resultType="java.lang.Integer" >
+    select count(*) from tb_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update tb_house
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.brief != null" >
+        brief = #{record.brief,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addcode != null" >
+        addcode = #{record.addcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null" >
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=TINYINT},
+      </if>
+      <if test="record.area != null" >
+        area = #{record.area,jdbcType=DOUBLE},
+      </if>
+      <if test="record.floor != null" >
+        floor = #{record.floor,jdbcType=INTEGER},
+      </if>
+      <if test="record.rooms != null" >
+        rooms = #{record.rooms,jdbcType=INTEGER},
+      </if>
+      <if test="record.orient != null" >
+        orient = #{record.orient,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rental != null" >
+        rental = #{record.rental,jdbcType=DOUBLE},
+      </if>
+      <if test="record.lease != null" >
+        lease = #{record.lease,jdbcType=INTEGER},
+      </if>
+      <if test="record.detail != null" >
+        detail = #{record.detail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tb_house
+    set id = #{record.id,jdbcType=BIGINT},
+      brief = #{record.brief,jdbcType=VARCHAR},
+      addcode = #{record.addcode,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=TINYINT},
+      area = #{record.area,jdbcType=DOUBLE},
+      floor = #{record.floor,jdbcType=INTEGER},
+      rooms = #{record.rooms,jdbcType=INTEGER},
+      orient = #{record.orient,jdbcType=VARCHAR},
+      rental = #{record.rental,jdbcType=DOUBLE},
+      lease = #{record.lease,jdbcType=INTEGER},
+      detail = #{record.detail,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="org.guangsoft.pojo.TbHouse" >
+    update tb_house
+    <set >
+      <if test="brief != null" >
+        brief = #{brief,jdbcType=VARCHAR},
+      </if>
+      <if test="addcode != null" >
+        addcode = #{addcode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="area != null" >
+        area = #{area,jdbcType=DOUBLE},
+      </if>
+      <if test="floor != null" >
+        floor = #{floor,jdbcType=INTEGER},
+      </if>
+      <if test="rooms != null" >
+        rooms = #{rooms,jdbcType=INTEGER},
+      </if>
+      <if test="orient != null" >
+        orient = #{orient,jdbcType=VARCHAR},
+      </if>
+      <if test="rental != null" >
+        rental = #{rental,jdbcType=DOUBLE},
+      </if>
+      <if test="lease != null" >
+        lease = #{lease,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null" >
+        detail = #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.guangsoft.pojo.TbHouse" >
+    update tb_house
+    set brief = #{brief,jdbcType=VARCHAR},
+      addcode = #{addcode,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      area = #{area,jdbcType=DOUBLE},
+      floor = #{floor,jdbcType=INTEGER},
+      rooms = #{rooms,jdbcType=INTEGER},
+      orient = #{orient,jdbcType=VARCHAR},
+      rental = #{rental,jdbcType=DOUBLE},
+      lease = #{lease,jdbcType=INTEGER},
+      detail = #{detail,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.guangsoft</groupId>
+		<artifactId>house_manager</artifactId>
+		<version>0.1.0</version>
+	</parent>
+	<artifactId>house_manager_mapper</artifactId>
+	<!-- 配置依赖注入 1，需要依赖pojo 2.由于mapper是mybatis操作的项目，所以需要导入mybatis的jar包，3，数据库的驱动jar -->
+	<dependencies>
+		<!-- 1,注入pojo -->
+		<dependency>
+			<groupId>org.guangsoft</groupId>
+			<artifactId>house_manager_pojo</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.guangsoft</groupId>
+			<artifactId>house_util</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<!-- 2.由于mapper是mybatis操作的项目 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>${mybatis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>${mybatis.spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.miemiedev</groupId>
+			<artifactId>mybatis-paginator</artifactId>
+			<version>${mybatis.paginator.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper</artifactId>
+			<version>${pagehelper.version}</version>
+		</dependency>
+		<!-- 3，数据库的驱动jar -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>${druid.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<resources>
+			<!-- 这个配置时告诉maven在做资源拷贝的时候(拷贝到target目录下)把src/main/java的properties和xml文件也都拷贝过去 -->
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>
