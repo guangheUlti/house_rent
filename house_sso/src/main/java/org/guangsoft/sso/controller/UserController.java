@@ -218,12 +218,12 @@ public class UserController {
 				row = sheet.createRow(i);
 				TbUser u = iterator.next();
 				String cellValue[] = {
-					u.getUsername().toString(),
-					u.getRealname().toString(),
-					u.getAge().toString(),
-					u.getIdnumber().toString(),
-					u.getAddress().toString(),
-					u.getPhone().toString()
+					u.getUsername() == null ? "" : u.getUsername().toString(),
+					u.getRealname() == null ? "" : u.getRealname().toString(),
+					u.getAge() == null ? "" : u.getAge().toString(),
+					u.getIdnumber() == null ? "" : u.getIdnumber().toString(),
+					u.getAddress() == null ? "" : u.getAddress().toString(),
+					u.getPhone() == null ? "" : u.getPhone().toString()
 				};
 				for(int j = 0; j < columns; j++) {
 					cell = row.createCell(j);
