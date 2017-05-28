@@ -3,6 +3,7 @@ import React from "react";
 import {Menu,message} from 'antd';
 import logo from '../static/img/logo.jpg';
 import Global from "./Global";
+import GHFetch from "../utils/FetchUtil";
 const Item = Menu.Item;
 
 class App extends React.Component {
@@ -27,17 +28,9 @@ class App extends React.Component {
   	}
   	componentDidMount() {
   		var that = this;
-		fetch( Global.Url.user_getInfo + Global.token,{
-			method: "POST",
-			headers: {"Content-Type":"application/x-www-form-urlencoded"},
-		  	body: this.state.requestParams
-		}).then(function(response) {
-		    if (response.status >= 400) {  
-		        throw new Error("Bad response from server!");
-    		}
-		    return response.json(); 
-		}).then(function(json) {
-			if(json.status !== 200) {
+  		var url = Global.Url.user_getInfo + Global.token;
+  		var callback = (json) => {
+  			if(json.status !== 200) {
 				alert(json.msg);
 				that.props.login();
 			} else {
@@ -45,23 +38,14 @@ class App extends React.Component {
 				that.setState({username:Global.user.username});
 				that.getMenu();
 			}
-		}).catch(function(error) {
-			console.log("request failed " + error);  
-		});	
+  		}
+  		GHFetch(url,null,callback);
   	}
   	getMenu = () => {
   		var that = this;
-  		fetch( Global.Url.public_getDictionary + "public_menu",{
-			method: "POST",
-			headers: {"Content-Type":"application/x-www-form-urlencoded"},
-		  	body: null
-		}).then(function(response) {
-		    if (response.status >= 400) {  
-		        throw new Error("Bad response from server!");
-    		}
-		    return response.json(); 
-		}).then(function(json) {
-			if(json.status !== 200) {
+  		var url = Global.Url.public_getDictionary + "public_menu";
+  		var callback = (json) => {
+  			if(json.status !== 200) {
 				message.error(json.msg);
 			} else {
 				let data = json.data;
@@ -71,9 +55,8 @@ class App extends React.Component {
 				}
 				that.setState({menuItem:menuItem});
 			}
-		}).catch(function(error) {
-			console.log("request failed " + error);  
-		});
+  		}
+  		GHFetch(url,null,callback);
   	}
   	handleMenu = (menuItem) => {
   		let key = menuItem.key;

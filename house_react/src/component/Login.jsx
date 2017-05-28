@@ -3,6 +3,7 @@ import React from "react";
 import {Form,Input,Button,Row,Col,message} from 'antd';
 import CookieUtil from "../utils/CookieUtil";
 import Global from "./Global";
+import GHFetch from "../utils/FetchUtil";
 
 class Login extends React.Component {
 	constructor(props) {
@@ -23,16 +24,7 @@ class Login extends React.Component {
   	}
 	doRequest = () => {
 		var that = this;
-		fetch( Global.Url.user_login,{
-			method: "POST",
-			headers: {"Content-Type":"application/x-www-form-urlencoded"},
-		  	body: this.state.requestParams
-		}).then(function(response) {
-		    if (response.status >= 400) {  
-		        throw new Error("Bad response from server!");
-    		}
-		    return response.json(); 
-		}).then(function(json) {
+		var callback = (json) => {
 			if(json.status !== 200) {
 				message.error(json.msg);
 			} else {
@@ -40,27 +32,13 @@ class Login extends React.Component {
 		    	CookieUtil.set("user",json.data);
 		    	that.props.enter();
 			}
-		}).catch(function(error) {
-			alert("request failed " + error);  
-		});
+		}
+		GHFetch(Global.Url.user_login,this.state.requestParams,callback);
 	}
 	handleSubmit = () => {
 		this.props.form.validateFields(["username","password","captcha"],(err,params) => {
 			if(err) {return;}
-			var requestParams = "";
-			if(params.username) {
-				requestParams += "&username=" + params.username;
-			}
-			if(params.password) {
-				requestParams += "&password=" + params.password;
-			}
-			if(params.captcha) {
-				requestParams += "&captcha=" + params.captcha;
-			}
-			if(requestParams.length > 0) {
-				requestParams = requestParams.substring(1,requestParams.length);
-			}
-			this.setState({requestParams:requestParams},() => {
+			this.setState({requestParams:params},() => {
 				this.doRequest();
 			});
 		});

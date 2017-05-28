@@ -2,6 +2,7 @@
 import React from "react";
 import {Form,Input,Button,Row,Col,message,Select} from 'antd';
 import Global from "./Global";
+import GHFetch from "../utils/FetchUtil";
 const Option = Select.Option;
 
 class Login extends React.Component {
@@ -24,82 +25,40 @@ class Login extends React.Component {
   	}
 	doRequest = () => {
 		var that = this;
-		fetch( Global.Url.user_register,{
-			method: "POST",
-			headers: {"Content-Type":"application/x-www-form-urlencoded"},
-		  	body: this.state.requestParams
-		}).then(function(response) {
-		    if (response.status >= 400) {  
-		        throw new Error("Bad response from server!");
-    		}
-		    return response.json(); 
-		}).then(function(json) {
+		var callback = (json) => {
 			if(json.status !== 200) {
 				message.error(json.msg);
 			} else {
 				message.success("注册成功！");
 		    	that.props.login();
 			}
-		}).catch(function(error) {
-			alert("request failed " + error);  
-		});
+		}
+		GHFetch(Global.Url.user_register,this.state.requestParams,callback);
 	}
 	handleSubmit = () => {
 		this.props.form.validateFields(["username","password","level"],(err,params) => {
 			if(err) {return;}
 			var that = this;
-			fetch( Global.Url.user_check + "username/" + params.username,{
-				method: "POST",
-				headers: {"Content-Type":"application/x-www-form-urlencoded"},
-			  	body: null
-			}).then(function(response) {
-			    if (response.status >= 400) {  
-			        throw new Error("Bad response from server!");
-	    		}
-			    return response.json(); 
-			}).then(function(json) {
+			var url = Global.Url.user_check + "username/" + params.username;
+			var callback = (json) => {
 				if(json.data === false) {
 					message.error("用户名已存在！");
 					return;
 				} else {
-					var requestParams = "";
-					if(params.username) {
-						requestParams += "&username=" + params.username;
-					}
-					if(params.password) {
-						requestParams += "&password=" + params.password;
-					}
-					if(params.level) {
-						requestParams += "&level=" + params.level;
-					}
-					if(requestParams.length > 0) {
-						requestParams = requestParams.substring(1,requestParams.length);
-					}
-					that.setState({requestParams:requestParams},() => {
-						that.doRequest();
-					});
+					that.setState({requestParams:params},() => {that.doRequest()});
 				}
-			}).catch(function(error) {
-				alert("request failed " + error);  
-			});
+			}
+			GHFetch(url,null,callback);
 		});
 	}
 	getDataDictionary = (option) => {
 		var that = this;
 		switch (option) {
 			case "level" :
-				var levelData = {};
-				var levelOption = [];
-				fetch( Global.Url.public_getDictionary + "user_level",{
-					method: "POST",
-					headers: {"Content-Type":"application/x-www-form-urlencoded"},
-				  	body: null
-				}).then(function(response) {
-				    if (response.status >= 400) {  
-				        throw new Error("Bad response from server!");
-		    		}
-				    return response.json(); 
-				}).then(function(json) {
+				var url = Global.Url.public_getDictionary + "user_level";
+				var callback = (json) => {
+					var levelData = {};
+					var levelOption = [];	
 					if(json.status !== 200) {
 						message.error(json.msg);
 					} else {
@@ -109,9 +68,7 @@ class Login extends React.Component {
 						}
 						that.setState({levelOption:levelOption});
 					}
-				}).catch(function(error) {
-					alert("request failed " + error);  
-				});
+				}
 				break;
 			default : alert("Bad get Dictionary");
 		}
