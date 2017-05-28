@@ -3,6 +3,7 @@ import React from "react";
 import {Form,Input,InputNumber,Button,Row,Col,message,Collapse,DatePicker,Select,Table,Modal} from 'antd';
 import moment from "moment";
 import Global from "../../Global";
+import GHFetch from "../../../utils/FetchUtil";
 const Option = Select.Option;
 const dateFormat = "YYYY-MM-DD";
 
@@ -26,6 +27,7 @@ class App extends React.Component {
 	}
 	componentDidMount() {
   		this.doRequest();
+  		this.getDataDictionary("status");
   	}
 	doRequest = () => {
 		var that = this;
@@ -53,6 +55,7 @@ class App extends React.Component {
 				dataSource[i].indexNum = i + 1;
 				dataSource[i].createTime = moment(dataSource[i].createTime).format(dateFormat);
 				dataSource[i].tradeCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
+				dataSource[i].payment = that.digitalFormat(dataSource[i].payment);
 			}
 	    	that.setState({dataSource:dataSource,total:json.total});
 		}).catch(function(error) {
@@ -74,6 +77,54 @@ class App extends React.Component {
 		this.setState({requestParams:requestParams},() => {
 			this.doRequest();
 		});
+	}
+	getDataDictionary = (option) => {
+		var that = this;
+		switch (option) {
+			case "level" :
+				var levelData = {};
+				var levelOption = [];
+				fetch( Global.Url.public_getDictionary + "user_level",{
+					method: "POST",
+					headers: {"Content-Type":"application/x-www-form-urlencoded"},
+				  	body: null
+				}).then(function(response) {
+				    if (response.status >= 400) {  
+				        throw new Error("Bad response from server!");
+		    		}
+				    return response.json(); 
+				}).then(function(json) {
+					if(json.status !== 200) {
+						message.error(json.msg);
+					} else {
+						levelData = json.data;
+						for(let level in levelData) {
+							levelOption.push(<Option key={level}>{levelData[level]}</Option>);
+						}
+						that.setState({levelOption:levelOption,levelData:levelData});
+					}
+				}).catch(function(error) {
+					alert("request failed " + error);  
+				});
+				break;
+			case "status" :
+				var url = Global.Url.public_getDictionary + "public_status";
+				var callback = (json) => {
+					if(json.status !== 200) {
+						message.error(json.msg);
+					} else {
+						let statusData = json.data;
+						let statusOption = [];
+						for(let status in statusData) {
+							statusOption.push(<Option key={status}>{statusData[status]}</Option>);
+						}
+						that.setState({statusOption:statusOption});
+					}
+				}
+				GHFetch(url, null, callback);
+				break;
+			default : alert("Bad get Dictionary");
+		}
 	}
 	persistFun = (option) => {
 		var that = this;
@@ -299,92 +350,53 @@ class App extends React.Component {
 					<Form>
 						<Row style={{marginTop:14}}>
 							<Col span={8}>
-								<FormItem label={"交易名"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("tradename",
-									{initialValue:"",rules:[{required:true,message:"请输入交易名！"}]})(
+								<FormItem label={"用户ID"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
+								{getFieldDecorator("userId",
+									{initialValue:"",rules:[{required:true,message:"请输入用户ID！"}]})(
 									<Input type={"text"} placeholder={"请输入"}/>)}
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem label={"密码"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("password",
-									{initialValue:"",rules:[{required:true,message:"请输入密码！"}]})(
+								<FormItem label={"房屋ID"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
+								{getFieldDecorator("houseId",
+									{initialValue:"",rules:[{required:true,message:"请输入房屋ID！"}]})(
 									<Input type={"text"} placeholder={"请输入"}/>)}
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem label={"交易类型"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-									{getFieldDecorator("level",
-										{initialValue:null,rules:[{required:true,message:"请输入交易类型！"}]})(
-											<Select placeholder="请选择" >
-												{this.state.levelOption}
-											</Select>)}
+								<FormItem label={"支付金额"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
+									{getFieldDecorator("payment",
+										{initialValue:null,rules:[{required:true,message:"请输入支付金额！"}]})(
+											<InputNumber placeholder={"请输入"}/>)}
 								</FormItem>
 							</Col>
 						</Row>
 						<Row style={{marginTop:14}}>
 							<Col span={8}>
-								<FormItem label={"真实姓名"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("realname",
-									{initialValue:"",rules:[{required:false,message:"请输入真实姓名！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"身份证号"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("idnumber",
-									{initialValue:"",rules:[{required:false,message:"请输入身份证号！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"联系地址"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("address",
-									{initialValue:"",rules:[{required:false,message:"请输入联系地址！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-						</Row>
-						<Row style={{marginTop:14}}>
-							<Col span={8}>
-								<FormItem label={"手机号"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("phone",
-									{initialValue:"",rules:[{required:false,message:"请输入手机号！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"性别"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-									{getFieldDecorator("gender",
-										{initialValue:null,rules:[{required:false,message:"请输入性别！"}]})(
-											<Select placeholder="请选择" >
-												{this.state.genderOption}
-											</Select>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"年龄"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("age",
-									{initialValue:"",rules:[{required:false,message:"请输入年龄！"}]})(
-									<InputNumber  placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-						</Row>
-						<Row style={{marginTop:14}}>
-							<Col span={8}>
-								<FormItem label={"邮箱"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("email",
-									{initialValue:"",rules:[{required:false,message:"请输入邮箱！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
+								<FormItem label={"支付类型"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
+								{getFieldDecorator("paymentType",
+									{initialValue:"",rules:[{required:true,message:"请输入支付类型！"}]})(
+									<Select placeholder="请选择" >
+										{this.state.paymentTypeOption}
+									</Select>)}
 								</FormItem>
 							</Col>
 							<Col span={8}>
 								<FormItem label={"交易状态"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
 								{getFieldDecorator("status",
-									{initialValue:null,rules:[{required:false,message:"请输入交易类型！"}]})(
-										<Select placeholder="请选择" >
-											{this.state.statusOption}
-										</Select>)}
+									{initialValue:"",rules:[{required:false,message:"请输入交易状态！"}]})(
+									<Select placeholder="请选择" >
+										{this.state.statusOption}
+									</Select>)}
+								</FormItem>
+							</Col>
+						</Row>
+						<Row style={{marginTop:14}}>
+							<Col span={20}>
+								<FormItem label={"备注"} style={{marginBottom:"0px"}} labelCol={{span:4}} wrapperCol={{span:14}}>
+								{getFieldDecorator("comment",
+									{initialValue:"",rules:[{required:false,message:"请输入备注！"}]})(
+									<Input type={"textarea"} rows={6} placeholder={"请输入"}/>)}
 								</FormItem>
 							</Col>
 						</Row>

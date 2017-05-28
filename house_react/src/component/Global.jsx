@@ -28,11 +28,13 @@ class Global extends React.Component{
 		trade_delete:"/house/trade/delete",
 		trade_getTrade:"/house/trade/getTrade/",
 		trade_getList:"/house/trade/getList",
+		trade_exportExcel:"/house/trade/exportExcel",
 		contract_create:"/house/contract/create",
 		contract_update:"/house/contract/update",
 		contract_delete:"/house/contract/delete",
 		contract_getTrade:"/house/contract/getTrade/",
 		contract_getList:"/house/contract/getList",
+		contract_exportExcel:"/house/contract/exportExcel",
 	};
 	static getContent = (content) => {
 		switch (content) {
