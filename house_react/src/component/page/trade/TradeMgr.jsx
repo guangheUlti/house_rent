@@ -40,6 +40,8 @@ class App extends React.Component {
 				dataSource[i].key = i;
 				dataSource[i].indexNum = i + 1;
 				dataSource[i].createTime = moment(dataSource[i].createTime).format(dateFormat);
+				dataSource[i].paymentTime = dataSource[i].paymentTime?moment(dataSource[i].paymentTime).format(dateFormat):"";
+				dataSource[i].closeTime = moment(dataSource[i].closeTime).format(dateFormat);
 				dataSource[i].tradeCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
 				dataSource[i].payment = that.digitalFormat(dataSource[i].payment);
 			}

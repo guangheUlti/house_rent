@@ -203,9 +203,8 @@ public class UserController {
 			HSSFRow row = null;
 			HSSFCell cell = null;
 			row = sheet.createRow(0);
-			int columns = 6;
 			String headName[] = {"用户ID","用户名","真实姓名","年龄","身份证号","地址","电话"};
-			for(int i = 0; i < columns; i++) {
+			for(int i = 0; i < headName.length; i++) {
 				sheet.setColumnWidth(i, 6000);
 				cell = row.createCell(i);
 				cell.setCellStyle(headRowStyle);
@@ -226,7 +225,7 @@ public class UserController {
 					u.getAddress() == null ? "" : u.getAddress().toString(),
 					u.getPhone() == null ? "" : u.getPhone().toString()
 				};
-				for(int j = 0; j < columns; j++) {
+				for(int j = 0; j < cellValue.length; j++) {
 					cell = row.createCell(j);
 					cell.setCellValue(cellValue[j]);
 				}

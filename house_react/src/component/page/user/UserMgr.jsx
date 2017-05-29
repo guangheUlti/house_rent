@@ -43,6 +43,7 @@ class App extends React.Component {
 				dataSource[i].key = i;
 				dataSource[i].indexNum = i + 1;
 				dataSource[i].levelValue = that.state.levelData[dataSource[i].level];
+				dataSource[i].createTime = moment(dataSource[i].createTime).format(dateFormat);
 			}
 	    	that.setState({dataSource:dataSource,total:json.total,selectedRowKeys:[]});
 		}
@@ -196,10 +197,10 @@ class App extends React.Component {
 		const columns = [
 			{title:"序号",dataIndex:"indexNum",key:"indexNum"},
 			{title:"用户名",dataIndex:"username",key:"username"},
-			{title:"电话",dataIndex:"phone",key:"phone"},
 			{title:"年龄",dataIndex:"age",key:"age"},
 			{title:"地址",dataIndex:"address",key:"address"},
-			{title:"用户类型",dataIndex:"levelValue",key:"levelValue"}
+			{title:"用户类型",dataIndex:"levelValue",key:"levelValue"},
+			{title:"创建时间",dataIndex:"createTime",key:"createTime"}
 		];
 		return (
 			<div>
@@ -208,7 +209,7 @@ class App extends React.Component {
 						<Panel header={"查询"} key={"0"}>
 							<Form>
 								<Col span={6}>
-									<FormItem label={"姓名"} labelCol={{span:10}} wrapperCol={{span:14}}>
+									<FormItem label={"用户名"} labelCol={{span:10}} wrapperCol={{span:14}}>
 										{getFieldDecorator(`username${search}`,
 											{initialValue:"",rules:[{required:false,message:"请输入姓名！"}]})(
 											<Input placeholder="请输入" />)}

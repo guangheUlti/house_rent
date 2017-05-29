@@ -46,8 +46,10 @@ class App extends React.Component {
 					if(this.state.isCreate) {
 						url = Global.Url.user_register;
 					} else {
+						let row = this.state.dataSource[this.state.selectedRowKeys[0]];
 						url = Global.Url.user_update;
-						params.id = this.state.dataSource[this.state.selectedRowKeys[0]].id;
+						params.id = row.id;
+						params.createTime = row.createTime;
 					}
 					var callback = (json) => {
 						if(json.status !== 200) {

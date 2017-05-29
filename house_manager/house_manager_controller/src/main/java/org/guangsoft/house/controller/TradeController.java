@@ -129,9 +129,8 @@ public class TradeController {
 			HSSFRow row = null;
 			HSSFCell cell = null;
 			row = sheet.createRow(0);
-			int columns = 6;
 			String headName[] = {"交易编号","用户ID","房屋ID","支付金额","创建时间"};
-			for(int i = 0; i < columns; i++) {
+			for(int i = 0; i < headName.length; i++) {
 				sheet.setColumnWidth(i, 6000);
 				cell = row.createCell(i);
 				cell.setCellStyle(headRowStyle);
@@ -150,7 +149,7 @@ public class TradeController {
 					t.getPayment() == null ? "" : t.getPayment().toString(),
 					t.getCreateTime() == null ? "" : DateUtil.getStrFromDate(t.getCreateTime())
 				};
-				for(int j = 0; j < columns; j++) {
+				for(int j = 0; j < cellValue.length; j++) {
 					cell = row.createCell(j);
 					cell.setCellValue(cellValue[j]);
 				}

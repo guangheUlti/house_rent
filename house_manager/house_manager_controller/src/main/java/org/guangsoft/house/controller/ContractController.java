@@ -129,9 +129,8 @@ public class ContractController {
 			HSSFRow row = null;
 			HSSFCell cell = null;
 			row = sheet.createRow(0);
-			int columns = 6;
 			String headName[] = {"合约编号","合约方","合约对手方","房屋ID","创建时间"};
-			for(int i = 0; i < columns; i++) {
+			for(int i = 0; i < headName.length; i++) {
 				sheet.setColumnWidth(i, 6000);
 				cell = row.createCell(i);
 				cell.setCellStyle(headRowStyle);
@@ -150,7 +149,7 @@ public class ContractController {
 					t.getHouse() == null ? "" : t.getHouse().toString(),
 					t.getCreateTime() == null ? "" : DateUtil.getStrFromDate(t.getCreateTime())
 				};
-				for(int j = 0; j < columns; j++) {
+				for(int j = 0; j < cellValue.length; j++) {
 					cell = row.createCell(j);
 					cell.setCellValue(cellValue[j]);
 				}
