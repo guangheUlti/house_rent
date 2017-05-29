@@ -43,7 +43,7 @@ function GHFetchWithTip(url, params, callback, tip) {
 		if (ghTip != null) {
 			PopupWait.close();
 		}
-		alert("request failed " + err); 
+		console.log("request failed " + err); 
 	});
 }
 export default GHFetchWithTip;

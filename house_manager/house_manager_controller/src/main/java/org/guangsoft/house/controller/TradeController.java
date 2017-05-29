@@ -137,11 +137,11 @@ public class TradeController {
 				cell.setCellValue(headName[i]);
 			}
 			AntdDataDto data = tradeService.getTradeList(pageNum, pageSize, trade);
-			List<TbTrade> tradeList = data.getDataT();
-			Iterator<TbTrade> iterator = tradeList.iterator();
+			List<?> tradeList = data.getData();
+			Iterator<?> iterator = tradeList.iterator();
 			for(int i = 1; iterator.hasNext(); i++) {
 				row = sheet.createRow(i);
-				TbTrade t = iterator.next();
+				TbTrade t = (TbTrade) iterator.next();
 				String cellValue[] = {
 					t.getId() == null ? "" : t.getId().toString(),
 					t.getUserId() == null ? "" : t.getUserId().toString(),

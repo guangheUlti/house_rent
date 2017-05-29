@@ -24,8 +24,8 @@ class App extends React.Component {
 		};
 	}
 	componentDidMount() {
-  		this.getDataDictionary("status");
-  		this.doRequest();
+  		this.getDataDictionary("status",()=>{this.doRequest()});
+  		this.getDataDictionary("type");
   	}
 	doRequest = () => {
 		var that = this;
@@ -37,12 +37,13 @@ class App extends React.Component {
 			for(let i = 0; i < dataSource.length; i++) {
 				dataSource[i].key = i;
 				dataSource[i].indexNum = i + 1;
+				dataSource[i].status = this.state.statusData[dataSource[i].status];
 				dataSource[i].createTime = moment(dataSource[i].createTime).format(dateFormat);
-				dataSource[i].contractCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
+				dataSource[i].houseCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
 			}
 	    	that.setState({dataSource:dataSource,total:json.total,selectedRowKeys:[]});
 		}
-		GHFetch(Global.Url.contract_getList, requestParams, callback);
+		GHFetch(Global.Url.house_getList, requestParams, callback);
 	}
 	handleSearch = () => {
 		var requestParams = this.props.form.getFieldsValue(["id","createTime"]);
@@ -54,7 +55,7 @@ class App extends React.Component {
 		}
 		this.setState({requestParams:requestParams},() => {this.doRequest()});
 	}
-	getDataDictionary = (option) => {
+	getDataDictionary = (option,GHcallback) => {
 		var that = this;
 		var url = null;
 		var callback = null;
@@ -70,7 +71,23 @@ class App extends React.Component {
 						for(let status in statusData) {
 							statusOption.push(<Option key={status}>{statusData[status]}</Option>);
 						}
-						that.setState({statusOption:statusOption});
+						that.setState({statusOption:statusOption,statusData:statusData},GHcallback);
+					}
+				}
+				GHFetch(url, null, callback);
+				break;
+			case "type" :
+				url = Global.Url.public_getDictionary + "house_type";
+				callback = (json) => {
+					if(json.status !== 200) {
+						message.error(json.msg);
+					} else {
+						let data = json.data;
+						let option = [];
+						for(let key in data) {
+							option.push(<Option key={key}>{data[key]}</Option>);
+						}
+						that.setState({statusOption:option,statusData:data},GHcallback);
 					}
 				}
 				GHFetch(url, null, callback);
@@ -111,7 +128,7 @@ class App extends React.Component {
 								that.doRequest();
 							}
 						}
-						GHFetch(Global.Url.contract_delete,params,callback);
+						GHFetch(Global.Url.house_delete,params,callback);
 					}
 				});
 				break;
@@ -129,7 +146,7 @@ class App extends React.Component {
 						}
 					}
 				}
-				window.open(Global.Url.contract_exportExcel + paramsStr);
+				window.open(Global.Url.house_exportExcel + paramsStr);
 				break;
 			default : alert("Bad persistFun");
 		}
@@ -165,10 +182,10 @@ class App extends React.Component {
 		};	
 		const columns = [
 			{title:"序号",dataIndex:"indexNum",key:"indexNum"},
-			{title:"合约编号",dataIndex:"contractCode",key:"contractCode"},
-			{title:"合约方ID",dataIndex:"member",key:"member"},
-			{title:"合约对手方ID",dataIndex:"rival",key:"rival"},
-			{title:"房屋ID",dataIndex:"house",key:"house"},
+			{title:"房屋编号",dataIndex:"houseCode",key:"houseCode"},
+			{title:"所属地区",dataIndex:"addcode",key:"addcode"},
+			{title:"租金",dataIndex:"rental",key:"rental"},
+			{title:"状态",dataIndex:"status",key:"status"},
 			{title:"创建时间",dataIndex:"createTime",key:"createTime"}
 		];
 		return (
@@ -178,7 +195,7 @@ class App extends React.Component {
 						<Panel header={"查询"} key={"0"}>
 							<Form>
 								<Col span={8}>
-									<FormItem label={"合约编号"} labelCol={{span:10}} wrapperCol={{span:14}}>
+									<FormItem label={"房屋编号"} labelCol={{span:10}} wrapperCol={{span:14}}>
 										{getFieldDecorator(`id${search}`,
 											{initialValue:"",rules:[{required:false,message:"请输入姓名！"}]})(
 											<Input placeholder="请输入" />)}
@@ -198,7 +215,7 @@ class App extends React.Component {
 								</Col>
 							</Form>
 						</Panel>
-						<Panel header={"合约管理"} key={"1"}>
+						<Panel header={"房屋管理"} key={"1"}>
 							<Button title={"增加"} type="ghost" icon="check" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"showCreate")}>增加</Button>
 							<Button title={"修改"} type="ghost" icon="edit" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"showUpdate")} disabled={!hasSelected}>修改</Button>
 							<Button title={"删除"} type="ghost" icon="close" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"delete")} disabled={!hasSelected}>删除</Button>

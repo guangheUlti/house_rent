@@ -31,6 +31,6 @@ function GHFetch(url, params, callback) {
 	}).then(checkStatus)
 	.then(parseJSON)
 	.then(json => {callback(json)})
-	.catch(err => { alert("request failed " + err); });
+	.catch(err => { console.log("request failed " + err); });
 }
 export default GHFetch;

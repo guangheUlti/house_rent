@@ -11,9 +11,6 @@ public class AntdDataDto {
 	public List<?> getData() {
 		return data;
 	}
-	public <T> List<T> getDataT() {
-		return (List<T>) data;
-	}
 	public void setData(List<?> data) {
 		this.data = data;
 	}

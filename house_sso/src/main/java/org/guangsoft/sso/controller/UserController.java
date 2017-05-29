@@ -211,11 +211,11 @@ public class UserController {
 				cell.setCellValue(headName[i]);
 			}
 			AntdDataDto data = userService.getUserList(pageNum, pageSize, user);
-			List<TbUser> userList = data.getDataT();
-			Iterator<TbUser> iterator = userList.iterator();
+			List<?> userList = data.getData();
+			Iterator<?> iterator = userList.iterator();
 			for(int i = 1; iterator.hasNext(); i++) {
 				row = sheet.createRow(i);
-				TbUser u = iterator.next();
+				TbUser u = (TbUser) iterator.next();
 				String cellValue[] = {
 					u.getId() == null ? "" : u.getId().toString(),
 					u.getUsername() == null ? "" : u.getUsername().toString(),

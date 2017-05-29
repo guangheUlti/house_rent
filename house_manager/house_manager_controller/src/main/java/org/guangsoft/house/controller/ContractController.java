@@ -137,11 +137,11 @@ public class ContractController {
 				cell.setCellValue(headName[i]);
 			}
 			AntdDataDto data = contractService.getContractList(pageNum, pageSize, contract);
-			List<TbContract> contractList = data.getDataT();
-			Iterator<TbContract> iterator = contractList.iterator();
+			List<?> contractList = data.getData();
+			Iterator<?> iterator = contractList.iterator();
 			for(int i = 1; iterator.hasNext(); i++) {
 				row = sheet.createRow(i);
-				TbContract t = iterator.next();
+				TbContract t = (TbContract) iterator.next();
 				String cellValue[] = {
 					t.getId() == null ? "" : t.getId().toString(),
 					t.getMember() == null ? "" : t.getMember().toString(),

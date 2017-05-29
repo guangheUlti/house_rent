@@ -6,8 +6,9 @@ import Global from "./component/Global";
 import Router from './component/Router';
 import logo from './static/img/logo.svg';
 import mainImg from './static/img/skyscraper.jpg';
-Global.city = document.getElementById('root').getAttribute("city");
-Global.province = document.getElementById('root').getAttribute("province");
+let rootElement = document.getElementById('root');
+Global.city = rootElement.getAttribute("city")?rootElement.getAttribute("city"):"上海";
+Global.province = rootElement.getAttribute("province")?rootElement.getAttribute("province"):"上海";
 
 class App extends React.Component {
 	constructor(props) {
