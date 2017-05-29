@@ -204,7 +204,7 @@ public class UserController {
 			HSSFCell cell = null;
 			row = sheet.createRow(0);
 			int columns = 6;
-			String headName[] = {"用户名","真实姓名","年龄","身份证号","地址","电话"};
+			String headName[] = {"用户ID","用户名","真实姓名","年龄","身份证号","地址","电话"};
 			for(int i = 0; i < columns; i++) {
 				sheet.setColumnWidth(i, 6000);
 				cell = row.createCell(i);
@@ -218,6 +218,7 @@ public class UserController {
 				row = sheet.createRow(i);
 				TbUser u = iterator.next();
 				String cellValue[] = {
+					u.getId() == null ? "" : u.getId().toString(),
 					u.getUsername() == null ? "" : u.getUsername().toString(),
 					u.getRealname() == null ? "" : u.getRealname().toString(),
 					u.getAge() == null ? "" : u.getAge().toString(),

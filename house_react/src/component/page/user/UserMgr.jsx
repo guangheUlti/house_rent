@@ -1,6 +1,6 @@
 // @Author : guanghe
 import React from "react";
-import {Form,Input,InputNumber,Button,Row,Col,message,Collapse,DatePicker,Select,Table,Modal} from 'antd';
+import {Form,Input,Button,Col,message,Collapse,DatePicker,Select,Table,Modal} from 'antd';
 import moment from "moment";
 import Global from "../../Global";
 import GHFetch from "../../../utils/FetchUtil";
@@ -59,9 +59,11 @@ class App extends React.Component {
 	}
 	getDataDictionary = (option) => {
 		var that = this;
+		var url = null;
+		var callback = null;
 		switch (option) {
 			case "level" :
-				var url = Global.Url.public_getDictionary + "user_level";
+				url = Global.Url.public_getDictionary + "user_level";
 				callback = (json) => {
 					var levelData = {};
 					var levelOption = [];
@@ -78,8 +80,8 @@ class App extends React.Component {
 				GHFetch(url, null, callback);
 				break;
 			case "status" :
-				var url = Global.Url.public_getDictionary + "public_status";
-				var callback = (json) => {
+				url = Global.Url.public_getDictionary + "public_status";
+				callback = (json) => {
 					if(json.status !== 200) {
 						message.error(json.msg);
 					} else {
@@ -94,9 +96,8 @@ class App extends React.Component {
 				GHFetch(url, null, callback);
 				break;
 			case "gender" :
-				var url = Global.Url.public_getDictionary + "user_gender";
-				var params = {};
-				var callback = (json) => {
+				url = Global.Url.public_getDictionary + "user_gender";
+				callback = (json) => {
 					var genderOption = [];
 					if(json.status !== 200) {
 						message.error(json.msg);
@@ -151,7 +152,6 @@ class App extends React.Component {
 				});
 				break;
 			case "exportExcel" :
-				var that = this;
 				var requestParams = this.state.requestParams;
 				requestParams.pageNum = this.state.pageNum ? this.state.pageNum : 1;
 				requestParams.pageSize = this.state.pageSize ? this.state.pageSize : 10;
@@ -187,9 +187,7 @@ class App extends React.Component {
 		const pagination = {
 			total:this.state.total,showSizeChanger:true,current:this.state.pageNum,
 			onShowSizeChange : (current,pageSize) => {
-				this.setState({pageNum:1,pageSize:pageSize},() => {
-					this.doRequest();
-				});
+				this.setState({pageNum:1,pageSize:pageSize},() => {this.doRequest()});
 			},
 			onChange : (current) => {
 				this.setState({pageNum:current},() => {this.doRequest()});

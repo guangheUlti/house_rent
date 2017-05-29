@@ -1,17 +1,19 @@
 // @Author : guanghe
 import React from "react";
-import {Form,Input,InputNumber,Button,Row,Col,message,Collapse,DatePicker,Select,Table,Modal} from 'antd';
+import {Form,Input,Button,Col,message,Collapse,DatePicker,Select,Table,Modal} from 'antd';
 import moment from "moment";
 import Global from "../../Global";
 import GHFetch from "../../../utils/FetchUtil";
+import EditModal from "./EditModal";
 const Option = Select.Option;
+const confirm = Modal.confirm;
 const dateFormat = "YYYY-MM-DD";
 
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			requestParams:"",
+			requestParams:{},
 			pageNum:1,
 			pageSize:10,
 			dataSource:[],
@@ -19,36 +21,20 @@ class App extends React.Component {
 			selectedRowKeys:[],
 			paymentTypeOption:[],
 			statusOption:[],
-			modalTitle:"",
-			modalVisible:false,
-			isCreate:true,
-			isDetail:false,
+			modal:[],
 		};
 	}
 	componentDidMount() {
-  		this.doRequest();
+		this.getDataDictionary("paymentType");
   		this.getDataDictionary("status");
+  		this.doRequest();
   	}
 	doRequest = () => {
 		var that = this;
 		var requestParams = this.state.requestParams;
-		let pageNum = this.state.pageNum ? this.state.pageNum : 1;
-		let pageSize = this.state.pageSize ? this.state.pageSize : 10;
-		if(requestParams) {
-			requestParams += "&";
-		}
-		requestParams += "pageNum=" + pageNum;
-		requestParams += "&pageSize=" + pageSize;
-		fetch( Global.Url.trade_getList,{
-			method: "POST",
-			headers: {"Content-Type":"application/x-www-form-urlencoded"},
-		  	body: requestParams
-		}).then(function(response) {
-		    if (response.status >= 400) {  
-		        throw new Error("Bad response from server!");
-    		}
-		    return response.json(); 
-		}).then(function(json) {
+		requestParams.pageNum = this.state.pageNum ? this.state.pageNum : 1;
+		requestParams.pageSize = this.state.pageSize ? this.state.pageSize : 10;
+		var callback = (json) => {
 			let dataSource = json.data;
 			for(let i = 0; i < dataSource.length; i++) {
 				dataSource[i].key = i;
@@ -57,59 +43,44 @@ class App extends React.Component {
 				dataSource[i].tradeCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
 				dataSource[i].payment = that.digitalFormat(dataSource[i].payment);
 			}
-	    	that.setState({dataSource:dataSource,total:json.total});
-		}).catch(function(error) {
-			alert("request failed " + error);  
-		});
+	    	that.setState({dataSource:dataSource,total:json.total,selectedRowKeys:[]});
+		}
+		GHFetch(Global.Url.trade_getList, requestParams, callback);
 	}
 	handleSearch = () => {
-		var searchParams = this.props.form.getFieldsValue(["id_s","createTime_s"]);
-		var requestParams = "";
-		if(searchParams.id_s) {
-			requestParams += "&id=" + Number(searchParams.id_s.substring(8,searchParams.id_s.length));
+		var requestParams = this.props.form.getFieldsValue(["id","createTime"]);
+		if(requestParams.id) {
+			requestParams.id = Number(requestParams.id.substring(8,requestParams.id.length));
 		}
-		if(searchParams.createTime_s) {
-			requestParams += "&createTime=" + moment(searchParams.createTime_s).format(dateFormat);
+		if(requestParams.createTime) {
+			requestParams.createTime = moment(requestParams.createTime).format(dateFormat);
 		}
-		if(requestParams.length > 0) {
-			requestParams = requestParams.substring(1,requestParams.length);
-		}
-		this.setState({requestParams:requestParams},() => {
-			this.doRequest();
-		});
+		this.setState({requestParams:requestParams},() => {this.doRequest()});
 	}
 	getDataDictionary = (option) => {
 		var that = this;
+		var url = null;
+		var callback = null;
 		switch (option) {
-			case "level" :
-				var levelData = {};
-				var levelOption = [];
-				fetch( Global.Url.public_getDictionary + "user_level",{
-					method: "POST",
-					headers: {"Content-Type":"application/x-www-form-urlencoded"},
-				  	body: null
-				}).then(function(response) {
-				    if (response.status >= 400) {  
-				        throw new Error("Bad response from server!");
-		    		}
-				    return response.json(); 
-				}).then(function(json) {
+			case "paymentType" :
+				url = Global.Url.public_getDictionary + "trade_payment_type";
+				callback = (json) => {
 					if(json.status !== 200) {
 						message.error(json.msg);
 					} else {
-						levelData = json.data;
-						for(let level in levelData) {
-							levelOption.push(<Option key={level}>{levelData[level]}</Option>);
+						let datas = json.data;
+						let options = [];
+						for(let key in datas) {
+							options.push(<Option key={key}>{datas[key]}</Option>);
 						}
-						that.setState({levelOption:levelOption,levelData:levelData});
+						that.setState({paymentTypeOption:options});
 					}
-				}).catch(function(error) {
-					alert("request failed " + error);  
-				});
+				}
+				GHFetch(url, null, callback);
 				break;
 			case "status" :
-				var url = Global.Url.public_getDictionary + "public_status";
-				var callback = (json) => {
+				url = Global.Url.public_getDictionary + "public_status";
+				callback = (json) => {
 					if(json.status !== 200) {
 						message.error(json.msg);
 					} else {
@@ -130,150 +101,66 @@ class App extends React.Component {
 		var that = this;
 		switch (option) {
 			case "showCreate" :
-				this.props.form.resetFields();
-				this.setState({modalTitle:"添加交易",modalVisible:true,isCreate:true,isDetail:false}); 
+				this.setState({modal:[<EditModal funName={"showCreate"} 
+					doRequest={this.doRequest} state={this.state} key={0}
+					closeModal={()=>{that.setState({modal:[]})}}/>]}); 
 				break;
 			case "showUpdate" :
-				let params = this.state.dataSource[this.state.selectedRowKeys[0]];
-				this.props.form.setFieldsValue({
-					tradename:params.tradename,
-					password:"000000",
-					level:params.level.toString(),
-					realname:params.realname,
-					idnumber:params.idnumber,
-					address:params.address,
-					phone:params.phone,
-					gender:params.gender.toString(),
-					age:params.age,
-					email:params.email,
-					status:params.status.toString()
-				});
-				this.setState({modalTitle:"修改交易",modalVisible:true,isCreate:false,isDetail:false}); 
-				break;
-			case "save" :
-				this.props.form.validateFields((error,params) => {
-					let requestParams = "";
-					if(!this.state.isCreate) {
-						requestParams += "&id=" + this.state.dataSource[this.state.selectedRowKeys[0]].id;
-					}
-					if(params.tradename) {
-						requestParams += "&tradename=" + params.tradename;
-					}
-					if(params.password) {
-						requestParams += "&password=" + params.password;
-					}
-					if(params.level) {
-						requestParams += "&level=" + params.level;
-					}
-					if(params.realname) {
-						requestParams += "&realname=" + params.realname;
-					}
-					if(params.idnumber) {
-						requestParams += "&idnumber=" + params.idnumber;
-					}
-					if(params.address) {
-						requestParams += "&address=" + params.address;
-					}
-					if(params.phone) {
-						requestParams += "&phone=" + params.phone;
-					}
-					if(params.gender) {
-						requestParams += "&gender=" + params.gender;
-					}
-					if(params.age) {
-						requestParams += "&age=" + params.age;
-					}
-					if(params.email) {
-						requestParams += "&email=" + params.email;
-					}
-					if(params.status) {
-						requestParams += "&status=" + params.status;
-					}
-					if(requestParams.length > 0) {
-						requestParams = requestParams.substring(1,requestParams.length);
-					}
-					var url = "";
-					if(this.state.isCreate) {
-						url = Global.Url.trade_register;
-					} else {
-						url = Global.Url.trade_update;
-					}
-					fetch( url,{
-						method: "POST",
-						headers: {"Content-Type":"application/x-www-form-urlencoded"},
-					  	body: requestParams
-					}).then(function(response) {
-					    if (response.status >= 400) {  
-					        throw new Error("Bad response from server!");
-			    		}
-					    return response.json(); 
-					}).then(function(json) {
-						if(json.status !== 200) {
-							message.error(json.msg);
-						} else {
-							if(that.state.isCreate) {
-								message.success("注册成功！");
-							} else {
-								message.success("修改成功！");
-							}
-							that.setState({modalVisible:false,selectedRowKeys:[]});
-							that.doRequest();
-						}
-					}).catch(function(error) {
-						alert("request failed " + error);  
-					});
-				});
-				break;
-			case "delete" :
-				fetch( Global.Url.trade_delete,{
-					method: "POST",
-					headers: {"Content-Type":"application/x-www-form-urlencoded"},
-				  	body: "id=" + this.state.dataSource[this.state.selectedRowKeys[0]].id
-				}).then(function(response) {
-				    if (response.status >= 400) {  
-				        throw new Error("Bad response from server!");
-		    		}
-				    return response.json(); 
-				}).then(function(json) {
-					if(json.status !== 200) {
-						message.error(json.msg);
-					} else {
-						message.success("删除成功！");
-						that.setState({selectedRowKeys:[]});
-						that.doRequest();
-					}
-				}).catch(function(error) {
-					alert("request failed " + error);  
-				});
+				this.setState({modal:[<EditModal funName={"showUpdate"} 
+					doRequest={this.doRequest} state={this.state} key={0}
+					closeModal={()=>{this.setState({modal:[]});}} />]}); 
 				break;
 			case "detail" :
-				let params2 = this.state.dataSource[this.state.selectedRowKeys[0]];
-				this.props.form.setFieldsValue({
-					tradename:params2.tradename,
-					password:"000000",
-					level:params2.level.toString(),
-					realname:params2.realname,
-					idnumber:params2.idnumber,
-					address:params2.address,
-					phone:params2.phone,
-					gender:params2.gender.toString(),
-					age:params2.age,
-					email:params2.email,
-					status:params2.status.toString()
+				this.setState({modal:[<EditModal funName={"detail"} 
+					state={this.state} key={0}
+					closeModal={()=>{this.setState({modal:[]});}} />]}); 
+				break;
+			case "delete" :
+				confirm({
+					title:"确认",
+					content:"您确认要删除吗？",
+					onCancel() {return;},
+					onOk() {
+						let params = {id:that.state.dataSource[that.state.selectedRowKeys[0]].id};
+						let callback = (json) => {
+							if(json.status !== 200) {
+								message.error(json.msg);
+							} else {
+								message.success("删除成功！");
+								that.doRequest();
+							}
+						}
+						GHFetch(Global.Url.trade_delete,params,callback);
+					}
 				});
-				this.setState({modalTitle:"交易详细信息",modalVisible:true,isDetail:true}); 
+				break;
+			case "exportExcel" :
+				var requestParams = this.state.requestParams;
+				requestParams.pageNum = this.state.pageNum ? this.state.pageNum : 1;
+				requestParams.pageSize = this.state.pageSize ? this.state.pageSize : 10;
+				let paramsStr = "";
+				if(requestParams != null) {
+					let first = true;
+					for(let p in requestParams) {
+						if(requestParams[p]) {
+							paramsStr += (first ? "?" : "&") + p + "=" + requestParams[p];
+							first = false;
+						}
+					}
+				}
+				window.open(Global.Url.trade_exportExcel + paramsStr);
 				break;
 			default : alert("Bad persistFun");
 		}
 	}
 	digitalFormat = (num) => {
-		return (parseFloat((num + "").replace(/[^\d\.-]/g,"")).toFixed(2) + "").replace(/\d{3}(?=(\d{3}) + (\.\d*)?$)/g,"$&,");
+		return (parseFloat((num + "").replace(/[^\d.-]/g,"")).toFixed(2) + "").replace(/\d{3}(?=(\d{3}) + (\.\d*)?$)/g,"$&,");
 	}
 	prefixInteger = (num, n) => {
         return (Array(n).join(0) + num).slice(-n);
     }
 	render() {
-		const search = "_s";
+		const search = "";
 		const hasSelected = this.state.selectedRowKeys.length > 0;
 		const {getFieldDecorator} = this.props.form;
 		const FormItem = Form.Item;
@@ -289,9 +176,7 @@ class App extends React.Component {
 		const pagination = {
 			total:this.state.total,showSizeChanger:true,current:this.state.pageNum,
 			onShowSizeChange : (current,pageSize) => {
-				this.setState({pageNum:1,pageSize:pageSize},() => {
-					this.doRequest();
-				});
+				this.setState({pageNum:1,pageSize:pageSize},() => {this.doRequest()});
 			},
 			onChange : (current) => {
 				this.setState({pageNum:current},() => {this.doRequest()});
@@ -334,74 +219,17 @@ class App extends React.Component {
 						</Panel>
 						<Panel header={"交易管理"} key={"1"}>
 							<Button title={"增加"} type="ghost" icon="check" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"showCreate")}>增加</Button>
-							<Button title={"修改"} type="ghost" icon="check" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"showUpdate")} disabled={!hasSelected}>修改</Button>
-							<Button title={"删除"} type="ghost" icon="check" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"delete")} disabled={!hasSelected}>删除</Button>
-							<Button title={"详细信息"} type="ghost" icon="check" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"detail")} disabled={!hasSelected}>详细信息</Button>
+							<Button title={"修改"} type="ghost" icon="edit" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"showUpdate")} disabled={!hasSelected}>修改</Button>
+							<Button title={"删除"} type="ghost" icon="close" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"delete")} disabled={!hasSelected}>删除</Button>
+							<Button title={"详细信息"} type="ghost" icon="exclamation-circle-o" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"detail")} disabled={!hasSelected}>详细信息</Button>
+							<Button title={"导出Excel"} type="ghost" icon="arrow-down" style={{marginRight:10,height:28}} onClick={this.persistFun.bind(this,"exportExcel")} >导出Excel</Button>
 						</Panel>
 					</Collapse>
 				</div>
 				<Table size="middle" pagination={pagination} columns={columns} 
 					rowSelection={rowSelection} dataSource={this.state.dataSource}
 					bordered footer={() => "总记录数 " + this.state.total + " 条"}/>
-				<Modal title={this.state.modalTitle} maskClosable={false} visible={this.state.modalVisible} 
-					width={"75%"} onCancel={()=>{this.setState({modalVisible:false})}} 
-					footer={this.state.isDetail?[]:[<Button key="0" type="primary" onClick={this.persistFun.bind(this,"save")}>确定</Button>,
-						<Button key="1" type="primary" onClick={()=>{this.setState({modalVisible:false})}}>取消</Button>]}>
-					<Form>
-						<Row style={{marginTop:14}}>
-							<Col span={8}>
-								<FormItem label={"用户ID"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("userId",
-									{initialValue:"",rules:[{required:true,message:"请输入用户ID！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"房屋ID"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("houseId",
-									{initialValue:"",rules:[{required:true,message:"请输入房屋ID！"}]})(
-									<Input type={"text"} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"支付金额"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-									{getFieldDecorator("payment",
-										{initialValue:null,rules:[{required:true,message:"请输入支付金额！"}]})(
-											<InputNumber placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-						</Row>
-						<Row style={{marginTop:14}}>
-							<Col span={8}>
-								<FormItem label={"支付类型"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("paymentType",
-									{initialValue:"",rules:[{required:true,message:"请输入支付类型！"}]})(
-									<Select placeholder="请选择" >
-										{this.state.paymentTypeOption}
-									</Select>)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
-								<FormItem label={"交易状态"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
-								{getFieldDecorator("status",
-									{initialValue:"",rules:[{required:false,message:"请输入交易状态！"}]})(
-									<Select placeholder="请选择" >
-										{this.state.statusOption}
-									</Select>)}
-								</FormItem>
-							</Col>
-						</Row>
-						<Row style={{marginTop:14}}>
-							<Col span={20}>
-								<FormItem label={"备注"} style={{marginBottom:"0px"}} labelCol={{span:4}} wrapperCol={{span:14}}>
-								{getFieldDecorator("comment",
-									{initialValue:"",rules:[{required:false,message:"请输入备注！"}]})(
-									<Input type={"textarea"} rows={6} placeholder={"请输入"}/>)}
-								</FormItem>
-							</Col>
-						</Row>
-					</Form>
-				</Modal>
+				{this.state.modal}
 			</div>
 		);
 	}

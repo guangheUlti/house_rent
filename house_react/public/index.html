@@ -11,8 +11,8 @@
 		<script type="text/javascript" src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js"></script>
 		<script>
 			var root = document.getElementById('root');
-			root.setAttribute('city', remote_ip_info.city);
-			root.setAttribute('province', remote_ip_info.province);
+			root.setAttribute('city', this.remote_ip_info?remote_ip_info.city:"");
+			root.setAttribute('province', this.remote_ip_info?remote_ip_info.province:"");
 		</script>
 	</body>
 </html>

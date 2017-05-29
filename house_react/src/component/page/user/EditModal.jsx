@@ -47,6 +47,7 @@ class App extends React.Component {
 						url = Global.Url.user_register;
 					} else {
 						url = Global.Url.user_update;
+						params.id = this.state.dataSource[this.state.selectedRowKeys[0]].id;
 					}
 					var callback = (json) => {
 						if(json.status !== 200) {

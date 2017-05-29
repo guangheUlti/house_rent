@@ -53,10 +53,12 @@ class Login extends React.Component {
 	}
 	getDataDictionary = (option) => {
 		var that = this;
+		var url = null;
+		var callback = null;
 		switch (option) {
 			case "level" :
-				var url = Global.Url.public_getDictionary + "user_level";
-				var callback = (json) => {
+				url = Global.Url.public_getDictionary + "user_level";
+				callback = (json) => {
 					var levelData = {};
 					var levelOption = [];	
 					if(json.status !== 200) {
@@ -69,6 +71,7 @@ class Login extends React.Component {
 						that.setState({levelOption:levelOption});
 					}
 				}
+				GHFetch(url,null,callback);
 				break;
 			default : alert("Bad get Dictionary");
 		}
