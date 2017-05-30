@@ -20,6 +20,7 @@ class App extends React.Component {
 			total:0,
 			selectedRowKeys:[],
 			statusOption:[],
+			typeOption:[],
 			modal:[],
 		};
 	}
@@ -37,7 +38,7 @@ class App extends React.Component {
 			for(let i = 0; i < dataSource.length; i++) {
 				dataSource[i].key = i;
 				dataSource[i].indexNum = i + 1;
-				dataSource[i].status = this.state.statusData[dataSource[i].status];
+				dataSource[i].statusName = this.state.statusData[dataSource[i].status];
 				dataSource[i].createTime = moment(dataSource[i].createTime).format(dateFormat);
 				dataSource[i].houseCode = moment().format("YYYYMMDD") + that.prefixInteger(dataSource[i].id,6);
 			}
@@ -87,7 +88,7 @@ class App extends React.Component {
 						for(let key in data) {
 							option.push(<Option key={key}>{data[key]}</Option>);
 						}
-						that.setState({statusOption:option,statusData:data},GHcallback);
+						that.setState({typeOption:option},GHcallback);
 					}
 				}
 				GHFetch(url, null, callback);
@@ -185,7 +186,7 @@ class App extends React.Component {
 			{title:"房屋编号",dataIndex:"houseCode",key:"houseCode"},
 			{title:"所属地区",dataIndex:"addcode",key:"addcode"},
 			{title:"租金",dataIndex:"rental",key:"rental"},
-			{title:"状态",dataIndex:"status",key:"status"},
+			{title:"状态",dataIndex:"statusName",key:"statusName"},
 			{title:"创建时间",dataIndex:"createTime",key:"createTime"}
 		];
 		return (

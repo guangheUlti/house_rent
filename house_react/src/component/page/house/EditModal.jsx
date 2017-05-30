@@ -10,7 +10,7 @@ class App extends React.Component {
 		this.state = {
 			dataSource:[],
 			selectedRowKeys:[],
-			paymentTypeOption:[],
+			typeOption:[],
 			statusOption:[],
 			modalTitle:"",
 			isCreate:true,
@@ -72,11 +72,17 @@ class App extends React.Component {
 	loadData = () => {
 		let params = this.state.dataSource[this.state.selectedRowKeys[0]];
 		this.props.form.setFieldsValue({
-			member:params.member,
-			rival:params.rival,
-			house:params.house,
-			review:params.review!=null?params.review.toString():"",
-			trade:params.trade!=null?params.trade.toString():"",
+			addcode:params.addcode,
+			address:params.address,
+			brief:params.brief,
+			area:params.area,
+			floor:params.floor,
+			rooms:params.rooms,
+			orient:params.orient,
+			rental:params.rental,
+			lease:params.lease,
+			detail:params.detail,
+			type:params.type!=null?params.type.toString():"",
 			status:params.status!=null?params.status.toString():""
 		});
 	}
@@ -134,7 +140,7 @@ class App extends React.Component {
 						<Col span={8}>
 							<FormItem label={"房间数"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
 							{getFieldDecorator("rooms",
-								{initialValue:"",rules:[{required:false,message:"请输入房间数！"}]})(
+								{initialValue:"",rules:[{required:true,message:"请输入房间数！"}]})(
 								<Input type={"text"} {...itemLayout} placeholder={"请输入"}/>)}
 							</FormItem>
 						</Col>
@@ -157,7 +163,7 @@ class App extends React.Component {
 						<Col span={8}>
 							<FormItem label={"租期"} style={{marginBottom:"0px"}} labelCol={{span:10}} wrapperCol={{span:14}}>
 							{getFieldDecorator("lease",
-								{initialValue:"",rules:[{required:false,message:"请输入租期！"}]})(
+								{initialValue:"",rules:[{required:true,message:"请输入租期！"}]})(
 								<Input type={"text"} {...itemLayout} placeholder={"请输入"}/>)}
 							</FormItem>
 						</Col>
@@ -168,7 +174,7 @@ class App extends React.Component {
 								{getFieldDecorator("status",
 									{initialValue:"",rules:[{required:true,message:"请选择房屋状态！"}]})(
 								<Select {...itemLayout} placeholder="请选择" >
-									{this.state.typeOption}
+									{this.state.statusOption}
 								</Select>)}
 							</FormItem>
 						</Col>

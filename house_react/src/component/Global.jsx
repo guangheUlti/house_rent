@@ -26,7 +26,7 @@ class Global extends React.Component{
 		house_create:"/house/house/create",
 		house_update:"/house/house/update",
 		house_delete:"/house/house/delete",
-		house_getTrade:"/house/house/getTrade/",
+		house_getHouse:"/house/house/getHouse/",
 		house_getList:"/house/house/getList",
 		house_exportExcel:"/house/house/exportExcel",
 		trade_create:"/house/trade/create",
@@ -38,7 +38,7 @@ class Global extends React.Component{
 		contract_create:"/house/contract/create",
 		contract_update:"/house/contract/update",
 		contract_delete:"/house/contract/delete",
-		contract_getTrade:"/house/contract/getTrade/",
+		contract_getContract:"/house/contract/getContract/",
 		contract_getList:"/house/contract/getList",
 		contract_exportExcel:"/house/contract/exportExcel",
 	};
