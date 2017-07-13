@@ -28,7 +28,7 @@ class App extends React.Component {
 					<img src={mainImg} alt="GHouse" className="App-mainImg"/>
 				</div>
 				<div className="App-location">
-					您所在的城市为：<a href={void(0)}>{Global.city}</a>
+					您所在的城市为：<a href={"https://www.baidu.com/s?wd="+Global.city} target="_blank" >{Global.city}</a>
 				</div>
 		  		<footer className="footer">
   					© 2017 &nbsp;
